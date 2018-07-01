@@ -3,7 +3,6 @@ const Logger = require('@hkube/logger');
 const { main, logger } = configIt.load();
 const log = new Logger(main.serviceName, logger);
 const componentName = require('./common/consts/componentNames');
-const { tracer, metrics } = require('@hkube/metrics');
 const cleaner = require('./lib/cleaner');
 const modules = [
     './lib/datastore/datastore-factory.js',
@@ -15,8 +14,6 @@ class Bootstrap {
         try {
             this._handleErrors();
             log.info('running application in ' + configIt.env() + ' environment', { component: componentName.MAIN });
-            await metrics.init(main.metrics);
-            await tracer.init(main.tracer);
             for (const m of modules) {// eslint-disable-line
                 await require(m).init(main, log);// eslint-disable-line
             }
