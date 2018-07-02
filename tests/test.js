@@ -29,6 +29,8 @@ describe('dummy test', () => {
             adapter.put({ jobId, taskId: '6', data: 'test6' })]);
 
         let t = await cleaner.cleanUpExpiredObjects();
-        expect(t.length).to.equal(7);
+        let countDeletedObjects = 0;
+        t.forEach(x => countDeletedObjects += x.Deleted.length)
+        expect(countDeletedObjects).to.equal(8);
     });
 });
