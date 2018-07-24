@@ -19,7 +19,6 @@ describe('dummy test', () => {
         let adapter = DatastoreFactory.getAdapter();
         await cleaner.cleanUpExpiredObjects();
         const jobId = Date.now();
-        var todayBeforeYear = moment().subtract(1, 'year');
 
         await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(40, 'days').format(adapter.DateFormat)}/test3/test3.json`, Body: { data: 'sss' } });
         await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(41, 'days').format(adapter.DateFormat)}/test4/test4.json`, Body: { data: 'sss' } });
