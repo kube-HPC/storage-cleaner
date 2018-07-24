@@ -3,12 +3,8 @@ const config = {};
 config.serviceName = 'storage-cleaner';
 config.defaultStorage = process.env.DEFAULT_STORAGE || 's3';
 const useSentinel = !!process.env.REDIS_SENTINEL_SERVICE_HOST;
-config.ObjectExpiration = 30; // in days
-
-config.kubernetes = {
-    isLocal: !!process.env.KUBERNETES_SERVICE_HOST,
-    namespace: process.env.NAMESPACE || 'default'
-};
+config.objectExpiration = process.env.OBJECT_EXPIRATION_DAYS || 5;
+config.deleteDestination = process.env.DELETE_DESTINATION;
 
 config.etcd = {
     protocol: 'http',
@@ -20,23 +16,6 @@ config.redis = {
     host: useSentinel ? process.env.REDIS_SENTINEL_SERVICE_HOST : process.env.REDIS_SERVICE_HOST || 'localhost',
     port: useSentinel ? process.env.REDIS_SENTINEL_SERVICE_PORT : process.env.REDIS_SERVICE_PORT || 6379,
     sentinel: useSentinel,
-};
-
-config.metrics = {
-    collectDefault: true,
-    server: {
-        port: process.env.METRICS_PORT || 9100
-    }
-};
-
-config.tracer = {
-    tracerConfig: {
-        serviceName: config.serviceName,
-        reporter: {
-            agentHost: process.env.JAEGER_AGENT_SERVICE_HOST || 'localhost',
-            agentPort: process.env.JAEGER_AGENT_SERVICE_PORT_AGENT_BINARY || 6832
-        }
-    }
 };
 
 config.s3 = {

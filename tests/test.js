@@ -11,7 +11,7 @@ const BUCKET_NAME = 'storage-cleaner-test';
 
 describe('dummy test', () => {
     before(async () => {
-        config.ObjectExpiration = 0;
+        config.objectExpiration = 30;
         await DatastoreFactory.init(config, null, true);
         await bootstrap.init();
     });
@@ -19,6 +19,27 @@ describe('dummy test', () => {
         let adapter = DatastoreFactory.getAdapter();
         await cleaner.cleanUpExpiredObjects();
         const jobId = Date.now();
+        var todayBeforeYear = moment().subtract(1, 'year');
+
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(40, 'days').format(adapter.DateFormat)}/test3/test3.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(41, 'days').format(adapter.DateFormat)}/test4/test4.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(42, 'days').format(adapter.DateFormat)}/test1/test2.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(43, 'days').format(adapter.DateFormat)}/test2/test3.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(44, 'days').format(adapter.DateFormat)}/test3/test4.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(45, 'days').format(adapter.DateFormat)}/test3/test5.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(46, 'days').format(adapter.DateFormat)}/test3/test6.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(47, 'days').format(adapter.DateFormat)}/test3/test7.json`, Body: { data: 'sss' } });
+
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(1, 'days').format(adapter.DateFormat)}/test3/test3.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(2, 'days').format(adapter.DateFormat)}/test4/test4.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(3, 'days').format(adapter.DateFormat)}/test1/test2.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(4, 'days').format(adapter.DateFormat)}/test2/test3.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(5, 'days').format(adapter.DateFormat)}/test3/test4.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(6, 'days').format(adapter.DateFormat)}/test3/test5.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(7, 'days').format(adapter.DateFormat)}/test3/test6.json`, Body: { data: 'sss' } });
+        await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(8, 'days').format(adapter.DateFormat)}/test3/test7.json`, Body: { data: 'sss' } });
+
+
         const results = await Promise.all([
             adapter.put({ jobId, taskId: '0', data: 'test0' }),
             adapter.put({ jobId, taskId: '1', data: 'test1' }),
@@ -31,6 +52,7 @@ describe('dummy test', () => {
         let t = await cleaner.cleanUpExpiredObjects();
         let countDeletedObjects = 0;
         t.forEach(x => countDeletedObjects += x.Deleted.length)
-        expect(countDeletedObjects).to.equal(8);
+        expect(countDeletedObjects).to.equal(16);
     });
+
 });
