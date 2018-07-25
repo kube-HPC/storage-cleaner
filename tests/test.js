@@ -17,7 +17,7 @@ describe('dummy test', () => {
     });
     it('clean old objects', async () => {
         let adapter = DatastoreFactory.getAdapter();
-        await cleaner.cleanUpExpiredObjects();
+        await cleaner.clean();
         const jobId = Date.now();
 
         await adapter._put({ Bucket: 'hkube', Key: `${moment().subtract(40, 'days').format(adapter.DateFormat)}/test3/test3.json`, Body: { data: 'sss' } });
@@ -48,7 +48,7 @@ describe('dummy test', () => {
             adapter.put({ jobId, taskId: '5', data: 'test5' }),
             adapter.put({ jobId, taskId: '6', data: 'test6' })]);
 
-        let t = await cleaner.cleanUpExpiredObjects();
+        let t = await cleaner.clean();
         let countDeletedObjects = 0;
         t.forEach(x => countDeletedObjects += x.Deleted.length)
         expect(countDeletedObjects).to.equal(16);

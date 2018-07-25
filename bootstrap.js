@@ -17,7 +17,7 @@ class Bootstrap {
             for (const m of modules) {// eslint-disable-line
                 await require(m).init(main, log);// eslint-disable-line
             }
-            await cleaner.cleanUpExpiredObjects();
+            await cleaner.clean();
             return main;
         }
         catch (error) {
