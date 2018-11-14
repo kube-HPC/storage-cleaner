@@ -2,10 +2,10 @@ const configIt = require('@hkube/config');
 const Logger = require('@hkube/logger');
 const { main, logger } = configIt.load();
 const log = new Logger(main.serviceName, logger);
+const storageManager = require('@hkube/storage-manager');
 const componentName = require('./common/consts/componentNames');
 const cleaner = require('./lib/cleaner');
 const modules = [
-    './lib/datastore/datastore-factory.js',
     './lib/cleaner.js'
 ];
 
@@ -14,6 +14,7 @@ class Bootstrap {
         try {
             this._handleErrors();
             log.info('running application in ' + configIt.env() + ' environment', { component: componentName.MAIN });
+            await storageManager.init(main);
             for (const m of modules) {// eslint-disable-line
                 await require(m).init(main, log);// eslint-disable-line
             }
