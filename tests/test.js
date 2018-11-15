@@ -29,6 +29,13 @@ describe('dummy test', () => {
         await storageManager._put({ Path: path.join('hkube', moment().subtract(45, 'days').format(storageManager.DateFormat), 'test3', 'test5.json'), Data: { data: 'sss' } });
         await storageManager._put({ Path: path.join('hkube', moment().subtract(46, 'days').format(storageManager.DateFormat), 'test3', 'test6.json'), Data: { data: 'sss' } });
         await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test3', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test44', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test55', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test66', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test77', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test88', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test99', 'test7.json'), Data: { data: 'sss' } });
+        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test00', 'test7.json'), Data: { data: 'sss' } });
 
         await storageManager._put({ Path: path.join('hkube', moment().subtract(2, 'days').format(storageManager.DateFormat), 'test4', 'test3.json'), Data: { data: 'sss' } });
         await storageManager._put({ Path: path.join('hkube', moment().subtract(3, 'days').format(storageManager.DateFormat), 'test1', 'test4.json'), Data: { data: 'sss' } });
@@ -51,7 +58,7 @@ describe('dummy test', () => {
         let t = await cleaner.clean();
         let countDeletedObjects = 0;
         t.forEach(x => countDeletedObjects += x.Deleted.length)
-        expect(countDeletedObjects).to.equal(8);
+        expect(countDeletedObjects).to.equal(15);
     }).timeout(5000);
     it('clean old objects fs', async () => {
         if (config.defaultStorage != 'fs') return;
