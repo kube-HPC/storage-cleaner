@@ -25,7 +25,7 @@ config.s3 = {
 };
 
 config.fs = {
-    baseDirectory: process.env.FS_DIRECTORY || '/var/tmp/fs/storage'
+    baseDirectory: process.env.FS_DIRECTORY || ''
 };
 
 config.storageAdapters = {

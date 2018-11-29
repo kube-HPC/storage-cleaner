@@ -1,6 +1,7 @@
 const chai = require('chai');
 const moment = require('moment');
 const { expect } = chai;
+const fs = require('fs-extra');
 const configIt = require('@hkube/config');
 const sinon = require('sinon');
 const config = configIt.load().main;
@@ -9,6 +10,14 @@ const bootstrap = require('../bootstrap');
 const storageManager = require('@hkube/storage-manager');
 const BUCKET_NAME = 'storage-cleaner-test';
 const path = require('path');
+const STORAGE_PREFIX = {
+    HKUBE: 'hkube',
+    HKUBE_RESULTS: 'hkube-results',
+    HKUBE_METADATA: 'hkube-metadata',
+    HKUBE_STORE: 'hkube-store',
+    HKUBE_EXECUTION: 'hkube-execution',
+    HKUBE_INDEX: 'hkube-index'
+}
 
 describe('dummy test', () => {
     before(async () => {
@@ -16,94 +25,67 @@ describe('dummy test', () => {
         await storageManager.init(config, true);
         await bootstrap.init();
     });
-    it('clean old objects s3', async () => {
-        if (config.defaultStorage != 's3') return;
+    it('clean old objects', async () => {
         await cleaner.clean();
         const jobId = Date.now();
 
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(40, 'days').format(storageManager.DateFormat), 'test3', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(41, 'days').format(storageManager.DateFormat), 'test4', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(42, 'days').format(storageManager.DateFormat), 'test1', 'test2.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(43, 'days').format(storageManager.DateFormat), 'test2', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(44, 'days').format(storageManager.DateFormat), 'test3', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(45, 'days').format(storageManager.DateFormat), 'test3', 'test5.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(46, 'days').format(storageManager.DateFormat), 'test3', 'test6.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test3', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test44', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test55', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test66', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test77', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test88', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test99', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test00', 'test7.json'), Data: { data: 'sss' } });
-
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(2, 'days').format(storageManager.DateFormat), 'test4', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(3, 'days').format(storageManager.DateFormat), 'test1', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(4, 'days').format(storageManager.DateFormat), 'test2', 'test2.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(5, 'days').format(storageManager.DateFormat), 'test3', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(6, 'days').format(storageManager.DateFormat), 'test3', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(7, 'days').format(storageManager.DateFormat), 'test3', 'test5.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(8, 'days').format(storageManager.DateFormat), 'test3', 'test6.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', moment().subtract(1, 'days').format(storageManager.DateFormat), 'test3', 'test7.json'), Data: { data: 'sss' } });
-
-        const results = await Promise.all([
-            storageManager.put({ jobId: jobId.toString(), taskId: '0', data: 'test0' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '1', data: 'test1' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '2', data: 'test2' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '3', data: 'test3' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '4', data: 'test4' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '5', data: 'test5' }),
-            storageManager.put({ jobId: jobId.toString(), taskId: '6', data: 'test6' })]);
-
-        const s = await storageManager.get({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test00', 'test7.json') });
-        expect(s.data).to.equal('sss');
+        for (let i = 0; i < 5; i++) {
+            await storageManager.put({ path: path.join('hkube-index', moment().subtract(40 + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
+            await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
+            await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task2', data: { test: 'test2' } });
+            await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task3', data: { test: 'test3' } });
+            await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task4', data: { test: 'test4' } });
+            await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task5', data: { test: 'test5' } });
+        }
         let t = await cleaner.clean();
 
-        const m = await storageManager.get({ Path: path.join('hkube', moment().subtract(47, 'days').format(storageManager.DateFormat), 'test00', 'test7.json') });
-        expect(m).to.have.property('error');
+        const result = [];
+        for (let i = 0; i < 5; i++) {
+            const a = await storageManager.get({ path: path.join('hkube-index', moment().subtract(40 + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) });
+            const b = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task1' });
+            const c = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task2' });
+            const d = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task3' });
+            const e = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task4' });
+            const f = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task5' });
+            expect(a).to.have.property('error');
+            expect(b).to.have.property('error');
+            expect(c).to.have.property('error');
+            expect(d).to.have.property('error');
+            expect(e).to.have.property('error');
+            expect(f).to.have.property('error');
+        }
     }).timeout(5000);
-    it('clean old objects fs', async () => {
-        if (config.defaultStorage != 'fs') return;
+    it('skip if not expired', async () => {
         await cleaner.clean();
-        const jobId = Date.now().toString();
+        const jobId = Date.now();
 
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(40, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test1.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(41, 'days').format(storageManager.DateFormat)}`, 'jobid4', 'test2.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(42, 'days').format(storageManager.DateFormat)}`, 'jobid1', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(43, 'days').format(storageManager.DateFormat)}`, 'jobid2', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(44, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test5.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(45, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test6.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(46, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid83', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid73', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid63', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid53', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid43', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid33', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid23', 'test8.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid13', 'test8.json'), Data: { data: 'sss' } });
-
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(5, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test5.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(2, 'days').format(storageManager.DateFormat)}`, 'jobid4', 'test2.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(6, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test6.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(1, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test1.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(4, 'days').format(storageManager.DateFormat)}`, 'jobid2', 'test4.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(3, 'days').format(storageManager.DateFormat)}`, 'jobid1', 'test3.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(7, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test7.json'), Data: { data: 'sss' } });
-        await storageManager._put({ Path: path.join('hkube', `${moment().subtract(8, 'days').format(storageManager.DateFormat)}`, 'jobid3', 'test8.json'), Data: { data: 'sss' } });
-
-        const results = await Promise.all([
-            storageManager.put({ jobId, taskId: '0', data: 'test0' }),
-            storageManager.put({ jobId, taskId: '1', data: 'test1' }),
-            storageManager.put({ jobId, taskId: '2', data: 'test2' }),
-            storageManager.put({ jobId, taskId: '3', data: 'test3' }),
-            storageManager.put({ jobId, taskId: '4', data: 'test4' }),
-            storageManager.put({ jobId, taskId: '5', data: 'test5' }),
-            storageManager.put({ jobId, taskId: '6', data: 'test6' })]);
-        const s = await storageManager.get({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid13', 'test8.json') });
-        expect(s.data).to.equal('sss');
+        for (let i = 0; i < 5; i++) {
+            await storageManager.put({ path: path.join('hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i), data: [] });
+            await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task1', data: { test: 'test1' } });
+            await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task2', data: { test: 'test2' } });
+            await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task3', data: { test: 'test3' } });
+            await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task4', data: { test: 'test4' } });
+            await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task5', data: { test: 'test5' } });
+        }
         let t = await cleaner.clean();
-        const m = await storageManager.get({ Path: path.join('hkube', `${moment().subtract(47, 'days').format(storageManager.DateFormat)}`, 'jobid13', 'test8.json') });
-        expect(m).to.have.property('error');
+
+        const result = [];
+        for (let i = 0; i < 5; i++) {
+            const a = await storageManager.get({ path: path.join('hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i) });
+            const b = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task1' });
+            const c = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task2' });
+            const d = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task3' });
+            const e = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task4' });
+            const f = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task5' });
+            expect(a).to.not.have.property('error');
+            expect(b).to.not.have.property('error');
+            expect(c).to.not.have.property('error');
+            expect(d).to.not.have.property('error');
+            expect(e).to.not.have.property('error');
+            expect(f).to.not.have.property('error');
+        }
+    }).timeout(5000);
+    after(() => {
+        Object.values(STORAGE_PREFIX).forEach(dir => fs.removeSync(dir));
     });
 });
