@@ -1,9 +1,9 @@
 const config = {};
 
 config.serviceName = 'storage-cleaner';
-config.defaultStorage = process.env.DEFAULT_STORAGE || 'fs';
+config.defaultStorage = process.env.DEFAULT_STORAGE || 's3';
 const useSentinel = !!process.env.REDIS_SENTINEL_SERVICE_HOST;
-config.objectExpiration = process.env.OBJECT_EXPIRATION_DAYS || 1;
+config.objectExpiration = process.env.OBJECT_EXPIRATION_DAYS || 5;
 config.deleteDestination = process.env.DELETE_DESTINATION;
 
 config.etcd = {
