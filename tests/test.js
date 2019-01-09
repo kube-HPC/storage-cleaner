@@ -32,28 +32,51 @@ describe('dummy test', () => {
         for (let i = 0; i < 5; i++) {
             await storageManager.put({ path: path.join('hkube-index', moment().subtract(40 + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
             await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
+            await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
+            await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test1' } });
+
             await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task2', data: { test: 'test2' } });
+            await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task2', data: { test: 'test2' } });
+            await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test2' } });
+
             await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task3', data: { test: 'test3' } });
+            await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task3', data: { test: 'test3' } });
+            await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test3' } });
+
             await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task4', data: { test: 'test4' } });
+            await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task4', data: { test: 'test4' } });
+            await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test4' } });
+
             await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task5', data: { test: 'test5' } });
+            await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task5', data: { test: 'test5' } });
+            await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'task5' } });
+
         }
         let t = await cleaner.clean();
 
         const result = [];
         for (let i = 0; i < 5; i++) {
-            const a = await storageManager.get({ path: path.join('hkube-index', moment().subtract(40 + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) });
-            const b = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task1' });
-            const c = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task2' });
-            const d = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task3' });
-            const e = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task4' });
-            const f = await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task5' });
-            expect(a).to.have.property('error');
-            expect(b).to.have.property('error');
-            expect(c).to.have.property('error');
-            expect(d).to.have.property('error');
-            expect(e).to.have.property('error');
-            expect(f).to.have.property('error');
+            result.push(await storageManager.get({ path: path.join('hkube-index', moment().subtract(40 + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) }));
+            result.push(await storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task1' }));
+            result.push(await storageManager.hkubeExecutions.get({ jobId: 'job' + i }));
+
+            result.push(await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task2' }));
+            result.push(await storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task2' }));
+            result.push(await storageManager.hkubeExecutions.get({ jobId: 'job' + i }));
+
+            result.push(await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task3' }));
+            result.push(await storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task3' }));
+            result.push(await storageManager.hkubeExecutions.get({ jobId: 'job' + i }));
+
+            result.push(await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task4' }));
+            result.push(await storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task4' }));
+            result.push(await storageManager.hkubeExecutions.get({ jobId: 'job' + i }));
+
+            result.push(await storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task5' }));
+            result.push(await storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task5' }));
+            result.push(await storageManager.hkubeExecutions.get({ jobId: 'job' + i }));
         }
+        result.forEach(x => expect(x).to.have.property('error'));
     }).timeout(5000);
     it('skip if not expired', async () => {
         await cleaner.clean();
@@ -83,7 +106,9 @@ describe('dummy test', () => {
             expect(d).to.not.have.property('error');
             expect(e).to.not.have.property('error');
             expect(f).to.not.have.property('error');
+            await storageManager.hkube.delete({ jobId: 'jobx' + i });
         }
+        await storageManager.hkubeIndex.delete({ date: moment().format(storageManager.hkubeIndex.DateFormat) });
     }).timeout(5000);
     after(() => {
         Object.values(STORAGE_PREFIX).forEach(dir => fs.removeSync(dir));

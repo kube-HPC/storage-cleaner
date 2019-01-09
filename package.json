@@ -28,8 +28,7 @@
   "dependencies": {
     "@hkube/config": "^2.0.7",
     "@hkube/logger": "^1.0.15",
-    "@hkube/storage-manager": "^1.0.27",
-    "lodash.groupby": "^4.6.0",
+    "@hkube/storage-manager": "^1.0.35",
     "moment": "^2.22.2"
   },
   "devDependencies": {
