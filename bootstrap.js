@@ -4,21 +4,18 @@ const { main, logger } = configIt.load();
 const log = new Logger(main.serviceName, logger);
 const storageManager = require('@hkube/storage-manager');
 const componentName = require('./common/consts/componentNames');
-const cleaner = require('./lib/cleaner');
+const cleanerManager = require('./lib/cleaners/cleaner-manager');
 const modules = [
-    './lib/cleaner.js'
+    storageManager,
+    cleanerManager
 ];
-
 class Bootstrap {
     async init() { // eslint-disable-line
         try {
             this._handleErrors();
             log.info('running application in ' + configIt.env() + ' environment', { component: componentName.MAIN });
-            await storageManager.init(main);
-            for (const m of modules) {// eslint-disable-line
-                await require(m).init(main, log);// eslint-disable-line
-            }
-            await cleaner.clean();
+            await Promise.all(modules.map(m => m.init(main)));
+            await cleanerManager.start();
             return main;
         }
         catch (error) {

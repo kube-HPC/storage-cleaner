@@ -2,19 +2,16 @@ const config = {};
 
 config.serviceName = 'storage-cleaner';
 config.defaultStorage = process.env.DEFAULT_STORAGE || 's3';
-const useSentinel = !!process.env.REDIS_SENTINEL_SERVICE_HOST;
-config.objectExpiration = process.env.OBJECT_EXPIRATION_DAYS || 5;
 
-config.etcd = {
-    protocol: 'http',
-    host: process.env.ETCD_CLIENT_SERVICE_HOST || 'localhost',
-    port: process.env.ETCD_CLIENT_SERVICE_PORT || 4001
-};
-
-config.redis = {
-    host: useSentinel ? process.env.REDIS_SENTINEL_SERVICE_HOST : process.env.REDIS_SERVICE_HOST || 'localhost',
-    port: useSentinel ? process.env.REDIS_SENTINEL_SERVICE_PORT : process.env.REDIS_SERVICE_PORT || 6379,
-    sentinel: useSentinel,
+config.cleaners = {
+    results: {
+        name: 'result objects',
+        objectExpiration: process.env.RESULT_OBJECT_EXPIRATION_DAYS || 20
+    },
+    temp: {
+        name: 'temp objects',
+        objectExpiration: process.env.TEMP_OBJECT_EXPIRATION_DAYS || 5
+    }
 };
 
 config.s3 = {
