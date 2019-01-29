@@ -6,7 +6,7 @@ config.defaultStorage = process.env.DEFAULT_STORAGE || 's3';
 config.cleaners = {
     results: {
         name: 'result objects',
-        objectExpiration: process.env.RESULT_OBJECT_EXPIRATION_DAYS || 20
+        objectExpiration: process.env.RESULT_OBJECT_EXPIRATION_DAYS || 10
     },
     temp: {
         name: 'temp objects',
