@@ -14,7 +14,7 @@ class Bootstrap {
         try {
             this._handleErrors();
             log.info('running application in ' + configIt.env() + ' environment', { component: componentName.MAIN });
-            await Promise.all(modules.map(m => m.init(main)));
+            await Promise.all(modules.map(m => m.init(main, log)));
             await cleanerManager.start();
             return main;
         }
