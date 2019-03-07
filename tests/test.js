@@ -22,7 +22,8 @@ const STORAGE_PREFIX = {
     HKUBE_METADATA: 'hkube-metadata',
     HKUBE_STORE: 'hkube-store',
     HKUBE_EXECUTION: 'hkube-execution',
-    HKUBE_INDEX: 'hkube-index'
+    HKUBE_INDEX: 'hkube-index',
+    HKUBE_BUILD: 'hkube-build'
 }
 
 describe('cleaner tests', () => {
@@ -107,7 +108,7 @@ describe('cleaner tests', () => {
                         await storageManager.hkubeResults.get({ jobId: 'job' + i });
 
                     }
-                }).timeout(6000);
+                }).timeout(60000);
                 it('clean results+temp objects', async () => {
                     await cleaner.start();
                     const jobId = Date.now();
