@@ -24,6 +24,8 @@ config.fs = {
     baseDirectory: process.env.BASE_FS_ADAPTER_DIRECTORY || ''
 };
 
+config.clusterName = process.env.CLUSTER_NAME || 'local';
+
 config.storageAdapters = {
     s3: {
         connection: config.s3,
