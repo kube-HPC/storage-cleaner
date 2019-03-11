@@ -17,13 +17,13 @@ const mockery = require('mockery');
 const adapters = ['s3', 'fs'];
 
 const STORAGE_PREFIX = {
-    HKUBE: 'hkube',
-    HKUBE_RESULTS: 'hkube-results',
-    HKUBE_METADATA: 'hkube-metadata',
-    HKUBE_STORE: 'hkube-store',
-    HKUBE_EXECUTION: 'hkube-execution',
-    HKUBE_INDEX: 'hkube-index',
-    HKUBE_BUILD: 'hkube-build'
+    HKUBE: 'local-hkube',
+    HKUBE_RESULTS: 'local-hkube-results',
+    HKUBE_METADATA: 'local-hkube-metadata',
+    HKUBE_STORE: 'local-hkube-store',
+    HKUBE_EXECUTION: 'local-hkube-execution',
+    HKUBE_INDEX: 'local-hkube-index',
+    HKUBE_BUILD: 'local-hkube-builds'
 }
 
 describe('cleaner tests', () => {
@@ -51,7 +51,7 @@ describe('cleaner tests', () => {
 
                     for (let i = 0; i < 5; i++) {
                         const a = main.cleaners.results;
-                        await storageManager.put({ path: path.join('hkube-index', moment().subtract(main.cleaners.temp.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
+                        await storageManager.put({ path: path.join('local-hkube-index', moment().subtract(main.cleaners.temp.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
                         await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
                         await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
                         await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test1' } });
@@ -80,7 +80,7 @@ describe('cleaner tests', () => {
                     }
                     let t = await cleaner.start();
                     for (let i = 0; i < 5; i++) {
-                        await storageManager.get({ path: path.join('hkube-index', moment().subtract(main.cleaners.temp.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) });
+                        await storageManager.get({ path: path.join('local-hkube-index', moment().subtract(main.cleaners.temp.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) });
                         expect(storageManager.hkube.get({ jobId: 'job' + i, taskId: 'task1' })).to.eventually.rejectedWith(Error);
 
                         expect(storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task1' })).to.eventually.rejectedWith(Error);
@@ -115,7 +115,7 @@ describe('cleaner tests', () => {
 
                     for (let i = 0; i < 5; i++) {
                         const a = main.cleaners.results;
-                        await storageManager.put({ path: path.join('hkube-index', moment().subtract(main.cleaners.results.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
+                        await storageManager.put({ path: path.join('local-hkube-index', moment().subtract(main.cleaners.results.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i), data: [] });
                         await storageManager.hkube.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
                         await storageManager.hkubeMetadata.put({ jobId: 'job' + i, taskId: 'task1', data: { test: 'test1' } });
                         await storageManager.hkubeExecutions.put({ jobId: 'job' + i, data: { test: 'test1' } });
@@ -146,7 +146,7 @@ describe('cleaner tests', () => {
 
                     const results = [];
                     for (let i = 0; i < 5; i++) {
-                        expect(storageManager.get({ path: path.join('hkube-index', moment().subtract(main.cleaners.results.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) })).to.eventually.rejectedWith(Error);
+                        expect(storageManager.get({ path: path.join('local-hkube-index', moment().subtract(main.cleaners.results.objectExpiration + i, 'days').format(storageManager.hkubeIndex.DateFormat), 'job' + i) })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkubeMetadata.get({ jobId: 'job' + i, taskId: 'task1' })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkubeExecutions.get({ jobId: 'job' + i })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkubeResults.get({ jobId: 'job' + i })).to.eventually.rejectedWith(Error);
@@ -173,7 +173,7 @@ describe('cleaner tests', () => {
                     const jobId = Date.now();
 
                     for (let i = 0; i < 5; i++) {
-                        await storageManager.put({ path: path.join('hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i), data: [] });
+                        await storageManager.put({ path: path.join('local-hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i), data: [] });
                         await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task1', data: { test: 'test1' } });
                         await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task2', data: { test: 'test2' } });
                         await storageManager.hkube.put({ jobId: 'jobx' + i, taskId: 'task3', data: { test: 'test3' } });
@@ -184,7 +184,7 @@ describe('cleaner tests', () => {
 
                     const result = [];
                     for (let i = 0; i < 5; i++) {
-                        const a = await storageManager.get({ path: path.join('hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i) });
+                        const a = await storageManager.get({ path: path.join('local-hkube-index', moment().format(storageManager.hkubeIndex.DateFormat), 'jobx' + i) });
                         const b = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task1' });
                         const c = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task2' });
                         const d = await storageManager.hkube.get({ jobId: 'jobx' + i, taskId: 'task3' });
