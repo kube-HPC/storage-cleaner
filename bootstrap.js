@@ -3,17 +3,17 @@ const Logger = require('@hkube/logger');
 const { main, logger } = configIt.load();
 const log = new Logger(main.serviceName, logger);
 const storageManager = require('@hkube/storage-manager');
-const componentName = require('./common/consts/componentNames');
+const component = require('./lib/consts/componentNames').MAIN;
 const cleanerManager = require('./lib/cleaners/cleaner-manager');
 const modules = [
     storageManager,
     cleanerManager
 ];
 class Bootstrap {
-    async init() { // eslint-disable-line
+    async init() {
         try {
             this._handleErrors();
-            log.info('running application in ' + configIt.env() + ' environment', { component: componentName.MAIN });
+            log.info(`running application with env: ${configIt.env()}, version: ${main.version}, node: ${process.versions.node}`, { component });
             await Promise.all(modules.map(m => m.init(main, log)));
             await cleanerManager.start();
             return main;
@@ -21,44 +21,35 @@ class Bootstrap {
         catch (error) {
             this._onInitFailed(error);
         }
+        return true;
     }
 
     _onInitFailed(error) {
-        if (log) {
-            log.error(error.message, { component: componentName.MAIN }, error);
-            log.error(error);
-        }
-        else {
-            console.error(error.message); // eslint-disable-line
-            console.error(error); // eslint-disable-line
-        }
+        log.error(error.message, { component }, error);
         process.exit(1);
     }
 
     _handleErrors() {
         process.on('exit', (code) => {
-            log.info('exit' + (code ? ' code ' + code : ''), { component: componentName.MAIN });
+            log.info(`exit code ${code}`, { component });
         });
         process.on('SIGINT', () => {
-            log.info('SIGINT', { component: componentName.MAIN });
-
-            process.exit(1);
+            log.info('SIGINT', { component });
+            process.exit(0);
         });
         process.on('SIGTERM', () => {
-            log.info('SIGTERM', { component: componentName.MAIN });
-            process.exit(1);
+            log.info('SIGTERM', { component });
+            process.exit(0);
         });
         process.on('unhandledRejection', (error) => {
-            log.error('unhandledRejection: ' + error.message, { component: componentName.MAIN }, error);
-            log.error(error);
+            log.error(`unhandledRejection: ${error.message}`, { component }, error);
+            process.exit(1);
         });
         process.on('uncaughtException', (error) => {
-            log.error('uncaughtException: ' + error.message, { component: componentName.MAIN }, error);
-            log.error(JSON.stringify(error));
+            log.error(`uncaughtException: ${error.message}`, { component }, error);
             process.exit(1);
         });
     }
 }
 
 module.exports = new Bootstrap();
-
