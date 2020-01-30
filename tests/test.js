@@ -73,12 +73,16 @@ describe('cleaner tests', () => {
 
                     for (let j = 1; j <= 5; j++) {
                         const jobId = 'job' + i;
+                        const pipelineName = 'pl' + i;
+                        const nodeName = 'nn' + i;
                         const taskId = 'task' + j;
+                        const fileName = 'fN';
                         const data = { test: 'test' + j };
                         await storageManager.hkube.put({ jobId, taskId, data });
                         await storageManager.hkubeMetadata.put({ jobId, taskId, data });
                         await storageManager.hkubeExecutions.put({ jobId, data });
                         await storageManager.hkubeResults.put({ jobId, data });
+                        await storageManager.hkubeAlgoMetrics.put({ jobId, taskId, pipelineName, nodeName, fileName, data })
                     }
                 }
                 await cleaner.start();
@@ -89,13 +93,17 @@ describe('cleaner tests', () => {
                     for (let j = 1; j <= 5; j++) {
                         const jobId = 'job' + i;
                         const taskId = 'task' + j;
+                        const pipelineName = 'pl' + i;
+                        const nodeName = 'nn' + i;
+                        const fileName = 'fN';
                         expect(storageManager.hkubeMetadata.get({ jobId, taskId })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkubeExecutions.get({ jobId })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkubeResults.get({ jobId })).to.eventually.rejectedWith(Error);
                         expect(storageManager.hkube.get({ jobId, taskId })).to.eventually.rejectedWith(Error);
+                        expect(storageManager.hkubeAlgoMetrics.get({ jobId, taskId, pipelineName, nodeName, fileName })).to.eventually.rejectedWith(Error);
                     }
                 }
-            }).timeout(10000);
+            }).timeout(60000);
             it('get and put object', async () => {
                 await cleaner.start();
 
