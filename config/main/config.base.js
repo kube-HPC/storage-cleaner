@@ -22,7 +22,7 @@ config.s3 = {
 };
 
 config.fs = {
-    baseDirectory: process.env.BASE_FS_ADAPTER_DIRECTORY || ''
+    baseDirectory: process.env.BASE_FS_ADAPTER_DIRECTORY || 'var/tmp/storage'
 };
 
 config.clusterName = process.env.CLUSTER_NAME || 'local';

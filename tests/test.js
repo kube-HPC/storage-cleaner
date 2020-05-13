@@ -5,33 +5,26 @@ const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
 const mockery = require('mockery');
 const configIt = require('@hkube/config');
+const { StorageManager } = require('@hkube/storage-manager');
+const cleaner = require('../lib/cleaners/cleaner-manager');
 const Logger = require('@hkube/logger');
-let storageManager, cleaner;
+let storageManager;
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
 const { main, logger } = configIt.load();
 const log = new Logger(main.serviceName, logger);
 const adapters = ['s3', 'fs'];
-let STORAGE_PREFIX;
 
 describe('cleaner tests', () => {
     adapters.forEach((adapter) => {
         describe('clean storage - using: ' + adapter, () => {
             before(async () => {
-                mockery.enable({
-                    warnOnReplace: false,
-                    warnOnUnregistered: false,
-                    useCleanCache: true
-                });
-                mockery.resetCache();
-                main.defaultStorage = adapter;
-                storageManager = require('@hkube/storage-manager'); // eslint-disable-line
-                await storageManager.init(main, log, true);
-                STORAGE_PREFIX = storageManager.prefixesTypes;
-                cleaner = require('../lib/cleaners/cleaner-manager');
+                storageManager = new StorageManager();
+                const config = { ...main, defaultStorage: adapter };
+                await storageManager.init(config, log, true);
 
-                await cleaner.init(main, log);
+                await cleaner.init(storageManager, main, log);
                 await cleaner.start();
             });
             it('clean temp objects', async () => {
@@ -132,7 +125,7 @@ describe('cleaner tests', () => {
 
     });
     after(() => {
-        STORAGE_PREFIX.forEach(dir => fs.removeSync(path.join(main.fs.baseDirectory, dir)));
+        fs.removeSync(main.fs.baseDirectory);
     });
 });
 
