@@ -27,8 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "@hkube/config": "^2.0.7",
-    "@hkube/logger": "^1.0.25",
-    "@hkube/storage-manager": "^2.0.19",
+    "@hkube/logger": "^1.0.26",
+    "@hkube/storage-manager": "^2.0.22",
     "moment": "^2.25.1"
   },
   "devDependencies": {
