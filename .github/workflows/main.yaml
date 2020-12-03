@@ -30,6 +30,10 @@ jobs:
         with:
           node-version: 14.x
       - run: npm ci
+      - name: setup
+        run: |
+          docker run -d -p 9000:9000 --name minio1 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" \
+          -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" minio/minio server /data
       - run: NODE_ENV=test npm run-script test-travis
       - name: Coveralls
         uses: coverallsapp/github-action@v1.1.2
